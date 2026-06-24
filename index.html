@@ -348,6 +348,29 @@
             opacity: 0;
         }
 
+        /* Profile Image Styles */
+        .profile-img-wrap {
+            width: 350px;
+            height: 450px;
+            border-radius: 2px;
+            overflow: hidden;
+            padding: 15px;
+            position: relative;
+        }
+
+        .profile-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1) contrast(1.1);
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
+        }
+
+        .profile-img-wrap:hover img {
+            transform: scale(1.05);
+            filter: grayscale(0) contrast(1);
+        }
+
         /* ROW 3: About Me */
         #about {
             flex-direction: row;
@@ -895,7 +918,12 @@
                 <a href="#"><i class="fas fa-envelope"></i></a>
             </div>
         </div>
-        <div class="hero-right" id="hologram-viewport"></div>
+        <div class="hero-right tilt-target-complex">
+            <div class="glass-card profile-img-wrap">
+                <!-- Add your actual profile image URL in the src attribute below -->
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800&auto=format&fit=crop" alt="Sajjad Ali Jatoi Profile">
+            </div>
+        </div>
     </section>
 
     <section id="about">
@@ -1411,76 +1439,6 @@
 
 
         /* ----------------------------------------------------
-           ROW 2: HOLOGRAPHIC AVATAR SCENE (Hero Avatar Engine)
-        ---------------------------------------------------- */
-        const holoContainer = document.getElementById('hologram-viewport');
-        const holoScene = new THREE.Scene();
-        const holoCamera = new THREE.PerspectiveCamera(45, holoContainer.clientWidth / holoContainer.clientHeight, 0.1, 1000);
-        holoCamera.position.z = 120;
-
-        const holoRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        holoRenderer.setSize(holoContainer.clientWidth, holoContainer.clientHeight);
-        holoRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        holoContainer.appendChild(holoRenderer.domElement);
-
-        const holoGroup = new THREE.Group();
-        holoScene.add(holoGroup);
-
-        const coreGeo = new THREE.IcosahedronGeometry(15, 2);
-        const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.25 });
-        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-        holoGroup.add(coreMesh);
-
-        const ringGeo1 = new THREE.RingGeometry(22, 23, 64);
-        const ringMat1 = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.15, wireframe: true });
-        const outerHoloRing1 = new THREE.Mesh(ringGeo1, ringMat1);
-        outerHoloRing1.rotation.x = Math.PI / 3;
-        holoGroup.add(outerHoloRing1);
-
-        const ringGeo2 = new THREE.RingGeometry(26, 26.5, 64);
-        const ringMat2 = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.08, wireframe: true });
-        const outerHoloRing2 = new THREE.Mesh(ringGeo2, ringMat2);
-        outerHoloRing2.rotation.y = Math.PI / 4;
-        holoGroup.add(outerHoloRing2);
-
-        const cloudCount = 400;
-        const cloudGeometry = new THREE.BufferGeometry();
-        const cloudPositions = new Float32Array(cloudCount * 3);
-
-        for(let i=0; i<cloudCount*3; i+=3) {
-            let u = Math.random();
-            let v = Math.random();
-            let theta = u * 2.0 * Math.PI;
-            let phi = Math.acos(2.0 * v - 1.0);
-            let r = 16 + Math.random() * 8; 
-            cloudPositions[i] = r * Math.sin(phi) * Math.cos(theta);
-            cloudPositions[i+1] = r * Math.sin(phi) * Math.sin(theta);
-            cloudPositions[i+2] = r * Math.cos(phi);
-        }
-        cloudGeometry.setAttribute('position', new THREE.BufferAttribute(cloudPositions, 3));
-        const cloudMaterial = new THREE.PointsMaterial({ size: 1.0, color: 0xffffff, transparent: true, opacity: 0.6 });
-        const particleCloudMesh = new THREE.Points(cloudGeometry, cloudMaterial);
-        holoGroup.add(particleCloudMesh);
-
-        let systemRunningClock = 0;
-        function animateHoloSystem() {
-            requestAnimationFrame(animateHoloSystem);
-            systemRunningClock += 0.01;
-
-            coreMesh.rotation.y += 0.005;
-            coreMesh.rotation.x += 0.002;
-            outerHoloRing1.rotation.z -= 0.003;
-            outerHoloRing2.rotation.z += 0.002;
-            particleCloudMesh.rotation.y -= 0.001;
-
-            holoGroup.position.y = Math.sin(systemRunningClock) * 3;
-            
-            holoRenderer.render(holoScene, holoCamera);
-        }
-        animateHoloSystem();
-
-
-        /* ----------------------------------------------------
            GSAP SCROLL TRIGGER & TIMELINES
         ---------------------------------------------------- */
         window.addEventListener('DOMContentLoaded', () => {
@@ -1629,10 +1587,6 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-
-            holoCamera.aspect = holoContainer.clientWidth / holoContainer.clientHeight;
-            holoCamera.updateProjectionMatrix();
-            holoRenderer.setSize(holoContainer.clientWidth, holoContainer.clientHeight);
         });
     </script>
 </body>
